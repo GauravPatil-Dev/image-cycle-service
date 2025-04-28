@@ -1,56 +1,85 @@
-# Take-home Full-Stack Technical Assessment Task
+# Image Service Application
 
-## Task: Image Service
-
-**Objective:**  
-Design and implement a RESTful service using **Kotlin** or **Java** to manage image objects. A simple UI should cycle through all images.
+A full-stack image management application with a Java Spring Boot backend and a React (Vite) frontend. Users can upload, view, and delete images in a multi-frame UI with real-time updates.
 
 ---
 
-## Requirements
-
-### Backend
-- Implement an HTTP (REST) service in **Java** or **Kotlin** that can perform CRUD operations on:
-  - **Images**: Store image to disk.
-  - **ImageMetadata**: Associate metadata with a specific image.
-- **ImageMetadata** can be any data, like size, name, MIME type.
-- You can use an **in-memory storage mechanism** for simplicity.
-- Focus on **service-oriented architecture** design and thinking through **edge cases**.
-
-### Frontend
-- Must use the APIs created above with any **modern UI framework**.
-- Build a **simple UX** that:
-  - Cycles through images on the backend.
-  - Shows the image name.
-- Should use a **notification mechanism from the backend** (i.e., **not** using images GET API or polling).
-  - Example: **Websockets** or **Server-Sent Events (SSE)**.
-- **New images** added via API while the UI is running should **show up automatically** in the cycle.
-- **Order of images** must be strict and **defined on the backend**.
-- **Must support multiple users** looking at the UI at the same time.
-- **Bonus**: Implement **multi-frame** view — multiple images cycling independently (but with same frequency) at the same time.
+## Features
+- Upload, view, and delete images
+- Multi-frame image viewer (select number of frames)
+- Real-time updates using Server-Sent Events (SSE)
+- Responsive, minimalist UI
+- Optimistic UI updates and robust error handling
 
 ---
 
-## Deliverables
-
-1. A **working RESTful service** that meets the above backend requirements.
-2. A **working frontend** that meets the above frontend requirements.
-3. A **Dockerfile** and **README** to build and run **both frontend and backend**.
-
----
-
-## Constraints
-
-- The task should take **no longer than a few hours** to complete.
-- Use **your preferred frameworks and tools** for the implementation.
-- **Forego Authentication and Authorization**.
+## Architecture
+- **Backend:** Java Spring Boot, exposes REST API `/api/images` and SSE `/api/images/stream`
+- **Frontend:** React (Vite), served via NGINX in Docker
+- **Communication:** API and SSE requests proxied from frontend to backend via NGINX
 
 ---
 
-## Follow-up
+## Project Structure
+```
+├── backend
+│   ├── src/main/java/com/example/imageservice/ ...
+│   ├── Dockerfile
+│   └── ...
+├── frontend
+│   ├── src/
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   └── ...
+├── docker-compose.yml
+└── README.md
+```
 
-During the follow-up session, be prepared to discuss:
-- The **architecture** you designed.
-- **User interactions**.
-- **Corner cases** you considered.
+---
 
+## Prerequisites
+- [Docker](https://www.docker.com/products/docker-desktop)
+- [Docker Compose](https://docs.docker.com/compose/)
+
+---
+
+## Quick Start (Production Mode)
+
+### 1. Build and Run with Docker Compose
+From the project root:
+```sh
+docker compose up --build
+```
+- This will build both backend and frontend images and start the containers.
+- The frontend will be available at: [http://localhost:3000](http://localhost:3000)
+- The backend API will be available at: [http://localhost:8080/api/images](http://localhost:8080/api/images)
+
+### 2. Stopping the Application
+```sh
+docker compose down
+```
+
+---
+
+## Development Notes
+- To make changes to the frontend or backend, edit the code and rerun `docker compose up --build`.
+- Images and metadata are stored in-memory (no persistent DB by default).
+- CORS is configured for frontend-backend communication.
+- NGINX proxies `/api` requests to the backend container.
+
+---
+
+## Troubleshooting
+- **CORS errors:** Ensure both frontend and backend are running in Docker, and CORS is enabled for `http://localhost:3000` in the backend.
+- **500 errors on frontend:** Ensure `dist/index.html` is generated and NGINX config has the correct `root` directive.
+- **Live reload:** Not enabled in production Docker; for dev, run frontend and backend locally.
+
+---
+
+## Credits
+- Spring Boot, React, Vite, NGINX, Docker
+
+---
+
+## License
+MIT (or your preferred license)

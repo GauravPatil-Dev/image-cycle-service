@@ -28,8 +28,16 @@ public class ImageController {
      * @return The stored Image object
      */
     @PostMapping
-    public ResponseEntity<Image> uploadImage(@RequestParam("file") MultipartFile file) {
-        return ResponseEntity.ok(imageService.saveImage(file));
+    public ResponseEntity<?> uploadImage(@RequestParam(value = "file", required = false) MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return ResponseEntity.badRequest().body("No file uploaded");
+        }
+        try {
+            Image img = imageService.saveImage(file);
+            return ResponseEntity.ok(img);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Failed to save image: " + e.getMessage());
+        }
     }
 
     /**
@@ -47,8 +55,12 @@ public class ImageController {
      * @return Image object (metadata only)
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Image> getImage(@PathVariable String id) {
-        return ResponseEntity.ok(imageService.getImage(id));
+    public ResponseEntity<?> getImage(@PathVariable String id) {
+        Image img = imageService.getImage(id);
+        if (img == null) {
+            return ResponseEntity.status(404).body("Image not found");
+        }
+        return ResponseEntity.ok(img);
     }
 
     /**
@@ -56,9 +68,17 @@ public class ImageController {
      * @param id Image ID
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteImage(@PathVariable String id) {
-        imageService.deleteImage(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteImage(@PathVariable String id) {
+        Image img = imageService.getImage(id);
+        if (img == null) {
+            return ResponseEntity.status(404).body("Image not found");
+        }
+        try {
+            imageService.deleteImage(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Failed to delete image: " + e.getMessage());
+        }
     }
 
     /**
@@ -67,8 +87,12 @@ public class ImageController {
      * @return ImageMetadata object
      */
     @GetMapping("/{id}/metadata")
-    public ResponseEntity<ImageMetadata> getImageMetadata(@PathVariable String id) {
-        return ResponseEntity.ok(imageService.getImageMetadata(id));
+    public ResponseEntity<?> getImageMetadata(@PathVariable String id) {
+        ImageMetadata meta = imageService.getImageMetadata(id);
+        if (meta == null) {
+            return ResponseEntity.status(404).body("Image metadata not found");
+        }
+        return ResponseEntity.ok(meta);
     }
 
     /**
@@ -87,10 +111,10 @@ public class ImageController {
      * @return Raw image bytes with correct MIME type
      */
     @GetMapping("/{id}/file")
-    public ResponseEntity<byte[]> getImageFile(@PathVariable String id) {
+    public ResponseEntity<?> getImageFile(@PathVariable String id) {
         Image image = imageService.getImage(id);
         if (image == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body("Image not found");
         }
         try {
             Path path = Paths.get(image.getPath());
@@ -100,7 +124,7 @@ public class ImageController {
                     .header("Content-Type", mimeType != null ? mimeType : "application/octet-stream")
                     .body(data);
         } catch (IOException e) {
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body("Failed to read image file");
         }
     }
 }

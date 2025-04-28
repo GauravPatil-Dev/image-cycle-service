@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class ImageServiceImpl implements ImageService {
     // In-memory stores for images and metadata
-    private final Map<String, Image> imageStore = new ConcurrentHashMap<>();
+    private final Map<String, Image> imageStore = new LinkedHashMap<>();
     private final Map<String, ImageMetadata> metadataStore = new ConcurrentHashMap<>();
     private final String imageDir = "images";
 

@@ -16,7 +16,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/images")
 public class ImageController {
     @Autowired

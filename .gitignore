@@ -1,5 +1,8 @@
 /backend/target/
 /frontend/node_modules/
+/frontend/dist/
+/frontend/package-lock.json
+/backend/images/
 *.log
 *.DS_Store
 .env

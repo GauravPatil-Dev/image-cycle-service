@@ -3,6 +3,9 @@ package com.example.imageservice.service.impl;
 import com.example.imageservice.model.Image;
 import com.example.imageservice.model.ImageMetadata;
 import com.example.imageservice.service.ImageService;
+
+import jakarta.annotation.PostConstruct;
+
 import com.example.imageservice.notification.ImageNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -95,6 +98,38 @@ public class ImageServiceImpl implements ImageService {
             notificationService.notifyClients("deleted:" + id);
         }
     }
+
+    @PostConstruct
+    public void loadImagesFromDisk() {
+        try {
+            Files.list(Paths.get(imageDir))
+                .filter(Files::isRegularFile)
+                .forEach(path -> {
+                    String filename = path.getFileName().toString();
+                    if (filename.contains("_")) {
+                        String[] parts = filename.split("_", 2);
+                        String id = parts[0];
+                        String originalName = parts[1];
+                        System.out.println("[ImageService] Loading image: " + id + " - " + originalName);
+                        Image image = new Image(id, originalName, path.toString());
+                        imageStore.put(id, image);
+
+                        try {
+                            long size = Files.size(path);
+                            String mimeType = Files.probeContentType(path);
+                            ImageMetadata metadata = new ImageMetadata(id, originalName, mimeType, size);
+                            metadataStore.put(id, metadata);
+                        } catch (IOException e) {
+                            // Could log file metadata reading error here
+                        }
+                    }
+                });
+            System.out.println("[ImageService] Reloaded " + imageStore.size() + " images from disk.");
+        } catch (IOException e) {
+            System.err.println("[ImageService] Failed to reload images from disk: " + e.getMessage());
+        }
+    }
+
 
     @Override
     /**

@@ -15,8 +15,8 @@ A full-stack image management application with a Java Spring Boot backend and a 
 
 ## Architecture
 - **Backend:** Java Spring Boot, exposes REST API `/api/images` and SSE `/api/images/stream`
-- **Frontend:** React (Vite), served via NGINX in Docker
-- **Communication:** API and SSE requests proxied from frontend to backend via NGINX
+- **Frontend:** React (Vite), served via Node in Docker
+- **Communication:** API and SSE requests proxied from frontend to backend via Node
 
 ---
 
@@ -29,7 +29,6 @@ A full-stack image management application with a Java Spring Boot backend and a 
 ├── frontend
 │   ├── src/
 │   ├── Dockerfile
-│   ├── nginx.conf
 │   └── ...
 ├── docker-compose.yml
 └── README.md
@@ -43,9 +42,9 @@ A full-stack image management application with a Java Spring Boot backend and a 
 
 ---
 
-## Quick Start (Production Mode)
+## Installation
 
-### 1. Build and Run with Docker Compose
+#### 1. Build and Run with Docker Compose
 From the project root:
 ```sh
 docker compose up --build
@@ -54,27 +53,35 @@ docker compose up --build
 - The frontend will be available at: [http://localhost:3000](http://localhost:3000)
 - The backend API will be available at: [http://localhost:8080/api/images](http://localhost:8080/api/images)
 
-### 2. Stopping the Application
+
+#### OR
+
+Build and Run with Docker Compose (Detached Mode Recommended)
+
+From the project root:
+```sh
+docker compose up --build -d
+```
+This will build both backend and frontend images and start the containers in the background (detached mode).
+
+for checking the runnning containers
+```sh
+docker ps
+```
+
+#### 2. Stopping the Application
 ```sh
 docker compose down
 ```
+This will stop all containers and clean up the associated network and volumes
 
 ---
-
 ## Development Notes
-- To make changes to the frontend or backend, edit the code and rerun `docker compose up --build`.
+- To make changes to the frontend or backend, edit the code and rerun `docker compose up --build` or `docker compose up --build -d`.
 - Images are stored on disk and metadata are stored in-memory.
 - CORS is configured for frontend-backend communication.
-- NGINX proxies `/api` requests to the backend container.
-
 ---
 
-## Troubleshooting
-- **CORS errors:** Ensure both frontend and backend are running in Docker, and CORS is enabled for `http://localhost:3000` in the backend.
-- **500 errors on frontend:** Ensure `dist/index.html` is generated and NGINX config has the correct `root` directive.
-- **Live reload:** Not enabled in production Docker; for dev, run frontend and backend locally.
-
----
 
 ## Credits
-- Spring Boot, React, Vite, NGINX, Docker
+- Spring Boot, React, Vite, Node, Docker

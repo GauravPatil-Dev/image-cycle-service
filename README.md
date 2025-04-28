@@ -63,7 +63,7 @@ docker compose down
 
 ## Development Notes
 - To make changes to the frontend or backend, edit the code and rerun `docker compose up --build`.
-- Images and metadata are stored in-memory (no persistent DB by default).
+- Images are stored on disk and metadata are stored in-memory.
 - CORS is configured for frontend-backend communication.
 - NGINX proxies `/api` requests to the backend container.
 
@@ -78,8 +78,3 @@ docker compose down
 
 ## Credits
 - Spring Boot, React, Vite, NGINX, Docker
-
----
-
-## License
-MIT (or your preferred license)

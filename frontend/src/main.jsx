@@ -73,7 +73,6 @@ function App() {
       .then((res) => res.json())
       .then((data) => {
         setImages(data);
-        if (data.length > 0) setImageName(data[0].name);
       });
   }, []);
 
